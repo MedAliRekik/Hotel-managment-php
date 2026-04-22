@@ -1,386 +1,405 @@
-# Hotel Management - PHP MVC Project
+# Hotel Management Web Application (PHP MVC)
 
-## Project Overview
+## Project Description
+This repository contains an academic **Hotel Management** web application developed with **PHP 8+, MySQL, PDO, and sessions**.
 
-This project is a small **Hotel Management web application** developed in **PHP** and **MySQL**, following the **MVC (Model - View - Controller)** architecture and **Object-Oriented Programming (OOP)** principles.
+The application provides an admin interface to manage:
+- clients,
+- rooms (including room images),
+- reservations,
+- and reservation search with multiple criteria.
 
-The application is designed for an academic project and must demonstrate:
+It follows a classic **MVC architecture** with separate controllers, models (entities + managers), and views rendered in PHP templates.
 
-- Dynamic web development using **HTML** and **PHP**
-- Respect of the **MVC pattern**
-- Use of **OOP**
-- Database access with **PDO**
-- Secure **authentication** using sessions
-- File upload using a dedicated **Uploader** class
-- CRUD operations on the main entities
-- Multi-criteria search
-- Proper use of PHP superglobals: `$_GET`, `$_POST`, `$_SESSION`, `$_FILES`
+---
+
+## Objectives
+This project demonstrates the following educational and technical objectives:
+
+- Build a dynamic PHP web application.
+- Apply the **MVC design pattern**.
+- Use **Object-Oriented Programming (OOP)** for domain modeling.
+- Access MySQL securely via **PDO**.
+- Handle authentication with **PHP sessions**.
+- Implement CRUD operations for core entities.
+- Implement multi-criteria reservation search.
+- Handle room image upload via `$_FILES` and a dedicated uploader class.
 
 ---
 
 ## Main Features
 
-### Authentication
-- Admin login
-- Admin logout
-- Session management
-- Secure password verification with `password_hash()` and `password_verify()`
+### Implemented
+- **Authentication**
+  - Admin login (`auth/login`) with password verification.
+  - Logout (`auth/logout`) with session destruction.
+- **Dashboard**
+  - Basic admin landing page after login.
+- **Client Management**
+  - Create, read, update, delete clients.
+- **Room Management**
+  - Create, read, update, delete rooms.
+  - Upload room image (JPG/PNG/WEBP, max size from config).
+- **Reservation Management**
+  - Create, read, update, delete reservations.
+  - Multi-criteria search by client name, room number, date range, status.
 
-### Main Entities
-The application manages the following entities:
-
-- **User**
-- **Client**
-- **Room**
-- **Reservation**
-
-### CRUD Features
-Full CRUD must be available for:
-
-- Clients
-- Rooms
-- Reservations
-
-### Search
-A multi-criteria search must be implemented for reservations using:
-
-- Client name
-- Room number
-- Check-in date
-- Check-out date
-- Reservation status
-
-### File Upload
-- Upload room images from the admin interface
-- Store uploaded files in the `uploads/rooms/` directory
-- Validate file type and size using a dedicated `Uploader` class
+### Partially Implemented / Missing
+- No role-based access control (single authenticated admin context).
+- No availability conflict check to prevent overlapping reservations for the same room.
+- No pagination for list pages.
+- No CSRF token protection in forms.
 
 ---
 
-## Technical Requirements
+## Project Architecture
 
-### Architecture
-The project must strictly follow the MVC pattern:
+The project uses a lightweight MVC approach driven by a front controller (`public/index.php`).
 
-- **Models**: entities, managers, database logic
-- **Views**: PHP/HTML pages
-- **Controllers**: request handling and coordination between models and views
+### MVC Responsibilities
+- **Controllers (`app/controllers`)**
+  - Read request data (`$_GET`, `$_POST`, `$_FILES`).
+  - Validate basic input.
+  - Call manager/model methods.
+  - Load corresponding view templates.
+- **Models (`app/models`)**
+  - `Database`: singleton PDO connection factory.
+  - `entities/*`: domain classes (`User`, `Client`, `Room`, `Reservation`).
+  - `managers/*`: DAO/services for CRUD and search.
+  - `Uploader`: room image upload validation + move logic.
+- **Views (`app/views`)**
+  - PHP/HTML templates for auth, dashboard, clients, rooms, reservations, and shared layout.
 
-### OOP Requirements
-The project must include:
-
-- One **Entity class** per entity
-- One **Manager / DAO class** per entity for CRUD operations
-- One **Database** class using **PDO**
-- One **Uploader** utility class
-
-### Security
-- Use **prepared statements** with PDO
-- Use **sessions** properly
-- Protect admin pages from unauthorized access
-- Sanitize and validate form data
+### Core Supporting Classes
+- **Database class**
+  - Loads DB config and creates PDO with exception mode.
+- **Uploader class**
+  - Validates upload error, file size, and MIME type.
+  - Generates unique filename and stores in `uploads/rooms/`.
+- **Manager classes**
+  - Encapsulate SQL operations with prepared statements.
+- **Entity classes**
+  - Encapsulate entity attributes with getters/setters.
 
 ---
 
 ## Project Structure
 
 ```text
-hotel-management/
-│
+Hotel-managment-php/
 ├── app/
 │   ├── controllers/
 │   │   ├── AuthController.php
 │   │   ├── ClientController.php
-│   │   ├── RoomController.php
-│   │   └── ReservationController.php
-│   │
+│   │   ├── ReservationController.php
+│   │   └── RoomController.php
 │   ├── models/
 │   │   ├── Database.php
 │   │   ├── Uploader.php
-│   │   │
 │   │   ├── entities/
-│   │   │   ├── User.php
 │   │   │   ├── Client.php
+│   │   │   ├── Reservation.php
 │   │   │   ├── Room.php
-│   │   │   └── Reservation.php
-│   │   │
+│   │   │   └── User.php
 │   │   └── managers/
-│   │       ├── UserManager.php
 │   │       ├── ClientManager.php
+│   │       ├── ReservationManager.php
 │   │       ├── RoomManager.php
-│   │       └── ReservationManager.php
-│   │
+│   │       └── UserManager.php
 │   └── views/
-│       ├── layouts/
-│       │   ├── header.php
-│       │   └── footer.php
-│       │
-│       ├── auth/
-│       │   └── login.php
-│       │
-│       ├── dashboard/
-│       │   └── index.php
-│       │
-│       ├── clients/
-│       │   ├── index.php
-│       │   ├── create.php
-│       │   └── edit.php
-│       │
-│       ├── rooms/
-│       │   ├── index.php
-│       │   ├── create.php
-│       │   └── edit.php
-│       │
-│       └── reservations/
-│           ├── index.php
-│           ├── create.php
-│           └── edit.php
-│
+│       ├── auth/login.php
+│       ├── dashboard/index.php
+│       ├── clients/{index,create,edit}.php
+│       ├── rooms/{index,create,edit}.php
+│       ├── reservations/{index,create,edit}.php
+│       └── layouts/{header,footer}.php
 ├── config/
 │   └── config.php
-│
 ├── database/
 │   ├── hotel_management.sql
 │   └── seed.sql
-│
 ├── public/
 │   ├── index.php
 │   └── assets/
-│       ├── css/
-│       │   └── style.css
-│       ├── js/
-│       │   └── script.js
-│       └── images/
-│
+│       ├── css/style.css
+│       └── js/script.js
 ├── uploads/
 │   └── rooms/
-│
-├── README.md
-└── .gitignore
+└── README.md
+```
 
+---
 
-Database Design
+## Database Design
 
-The database must contain at least these 4 related tables:
+The SQL schema is located in `database/hotel_management.sql` and seeds in `database/seed.sql`.
 
-users
+### Main Tables
+- `users`: admin account credentials.
+- `clients`: hotel clients.
+- `rooms`: room catalog with type, price, status, optional image.
+- `reservations`: links `client_id` + `room_id` with date range and status.
 
-* id
-* fullname
-* email
-* password
-* created_at
+### Relationships
+- `reservations.client_id` → `clients.id` (`ON DELETE CASCADE`).
+- `reservations.room_id` → `rooms.id` (`ON DELETE RESTRICT`).
 
-clients
+### Notes
+- Room numbers are unique.
+- User emails are unique.
+- Reservation and room statuses are constrained by SQL `ENUM`.
+- Seed data includes one admin user and sample clients/rooms/reservations.
 
-* id
-* first_name
-* last_name
-* phone
-* email
-* created_at
+---
 
-rooms
+## OOP Design
 
-* id
-* room_number
-* type
-* price
-* status
-* image
-* created_at
+OOP is used in these layers:
 
-reservations
+- **Entities** (`User`, `Client`, `Room`, `Reservation`):
+  - private attributes,
+  - constructor initialization,
+  - getters/setters.
+- **Managers** (`UserManager`, `ClientManager`, `RoomManager`, `ReservationManager`):
+  - each manager owns persistence operations for one entity.
+- **Infrastructure classes**:
+  - `Database` for shared PDO lifecycle,
+  - `Uploader` for upload-specific behavior.
 
-* id
-* client_id
-* room_id
-* check_in
-* check_out
-* status
-* created_at
+### Design Observation
+Managers currently return arrays for many read operations instead of hydrated entity objects; this is practical but not fully consistent with a pure domain-driven OOP approach.
 
-Relationships
+---
 
-* One reservation belongs to one client
-* One reservation belongs to one room
-* One client can have many reservations
-* One room can be linked to many reservations over time
+## Authentication Flow
 
-⸻
+1. User opens login page (`controller=auth&action=login`).
+2. Submitted credentials are validated via `UserManager::findByEmail()`.
+3. `password_verify()` checks plaintext password against hashed DB value.
+4. On success, `$_SESSION['user']` is created and user is redirected to dashboard.
+5. Protected controllers (`ClientController`, `RoomController`, `ReservationController`) call `ensureAuthenticated()` in constructor.
+6. Logout clears and destroys session then redirects to login.
 
-Required Classes
+---
 
-Entities
+## Routing / Navigation
 
-* User
-* Client
-* Room
-* Reservation
+Routing is handled by `public/index.php`:
+- Reads `controller` and `action` from query string.
+- Maps controller key to file/class.
+- Instantiates controller and invokes action method if it exists.
+- Special-cases `dashboard` route directly in front controller.
 
-Each entity class must contain:
+### Entry Point
+- Main entry: `public/index.php`.
 
-* private attributes
-* constructor
-* getters and setters
+---
 
-Managers
+## Installation
 
-* UserManager
-* ClientManager
-* RoomManager
-* ReservationManager
+### Prerequisites
+- PHP 8.0+ (with PDO MySQL extension)
+- MySQL / MariaDB
+- Apache (XAMPP/LAMP/WAMP) or PHP built-in server
 
-Each manager class must use PDO and implement the required CRUD logic.
+### Steps (XAMPP-style)
 
-Utility Classes
+```bash
+# 1) Clone
+git clone <your-repo-url>
 
-* Database for PDO connection using Singleton pattern
-* Uploader for file uploads
+# 2) Place in htdocs
+# Example path:
+# C:\xampp\htdocs\Hotel-managment-php
+```
 
-⸻
+1. Start **Apache** and **MySQL**.
+2. Create/import database:
+   - Import `database/hotel_management.sql`.
+   - Import `database/seed.sql`.
+3. Check DB settings in `config/config.php`:
+   - host, port, dbname, username, password.
+4. Ensure upload directory is writable:
+   - `uploads/rooms/`.
 
-Controllers
+---
 
-AuthController
+## How to Run the Project
 
-Must handle:
+### Option A: Apache (recommended for this project)
+Open in browser:
+
+```text
+http://localhost/Hotel-managment-php/public/index.php
+```
+
+### Option B: PHP built-in server
+From project root:
+
+```bash
+php -S localhost:8000 -t public
+```
+
+Then open:
 
-* login
-* logout
-
-ClientController
-
-Must handle:
-
-* list clients
-* create client
-* edit client
-* delete client
-* search if needed
-
-RoomController
-
-Must handle:
-
-* list rooms
-* create room
-* edit room
-* delete room
-* upload room image
-
-ReservationController
-
-Must handle:
-
-* list reservations
-* create reservation
-* edit reservation
-* delete reservation
-* multi-criteria search
-
-⸻
-
-Views
-
-The application must provide pages for:
-
-* login
-* dashboard
-* clients list / create / edit
-* rooms list / create / edit
-* reservations list / create / edit
-
-A simple admin layout with:
-
-* header
-* footer
-* navigation menu
-
-⸻
-
-Routing
-
-The entry point of the application must be:
-
-* public/index.php
-
-Routing can be based on query parameters such as:
-
-* controller
-* action
-
-Example:
-
-* index.php?controller=auth&action=login
-* index.php?controller=client&action=index
-* index.php?controller=room&action=create
-* index.php?controller=reservation&action=index
-
-⸻
-
-Expected Behavior
-
-Authentication Flow
-
-* User opens login page
-* User submits email and password
-* Credentials are checked against database
-* Session starts if authentication succeeds
-* User is redirected to dashboard
-* User can logout
-
-Client Management
-
-* Admin can create, view, edit and delete clients
-
-Room Management
-
-* Admin can create, view, edit and delete rooms
-* Admin can upload a room image
-
-Reservation Management
-
-* Admin can create, view, edit and delete reservations
-* Admin can search reservations using multiple filters
-
-⸻
-
-Coding Guidelines
-
-The generated code must follow these rules:
-
-* pure PHP, no framework
-* beginner-friendly and readable code
-* clear separation of responsibilities
-* clean folder organization
-* comments where useful
-* use PDO prepared statements only
-* avoid overly complex code
-* keep naming consistent with this README
-
-⸻
-
-Generation Instructions for AI Code Assistant
-
-The code generator must:
-
-1. Read this README first
-2. Respect the exact project structure
-3. Generate all required folders and files
-4. Implement the database schema in SQL
-5. Implement all PHP classes
-6. Implement all controllers
-7. Implement all views
-8. Implement authentication
-9. Implement CRUD features
-10. Implement multi-criteria search
-11. Implement file upload
-12. Keep code simple and maintainable
-
-Important:
-
-* Do not change the architecture
-* Do not rename files unless absolutely necessary
-* Generate a complete working academic project
-* Keep the code consistent with MVC and OOP principles
+```text
+http://localhost:8000/index.php
+```
+
+### Demo Credentials
+- **Email:** `admin@hotel.com`
+- **Password:** `admin123`
+
+---
+
+## Example URLs
+
+- Login:
+  - `index.php?controller=auth&action=login`
+- Dashboard:
+  - `index.php?controller=dashboard&action=index`
+- Clients:
+  - `index.php?controller=client&action=index`
+  - `index.php?controller=client&action=create`
+  - `index.php?controller=client&action=edit&id=1`
+- Rooms:
+  - `index.php?controller=room&action=index`
+  - `index.php?controller=room&action=create`
+- Reservations:
+  - `index.php?controller=reservation&action=index`
+  - `index.php?controller=reservation&action=create`
+  - Search example:
+    - `index.php?controller=reservation&action=index&client_name=John&status=confirmed`
+
+---
+
+## Screens / Functional Modules
+
+- **Auth screen**: admin login form + error feedback.
+- **Dashboard**: simple welcome panel and navigation hub.
+- **Clients module**: tabular listing + create/edit/delete forms.
+- **Rooms module**: listing, create/edit/delete, image display/upload.
+- **Reservations module**: listing, create/edit/delete, filtering/search form.
+
+---
+
+## Security Review
+
+Below is a concise audit based on the current code.
+
+### Positive Points
+- Uses PDO prepared statements in CRUD and search queries.
+- Passwords are hashed and verified with `password_verify()`.
+- Output escaping (`htmlspecialchars`) is applied on most dynamic view data.
+- Upload MIME type and file size checks exist.
+
+### Identified Risks & Fixes
+
+1. **Missing CSRF protection (High)**
+   - **Where:** all state-changing forms (create/edit/delete/logout).
+   - **Risk:** attacker can force authenticated admin actions via cross-site requests.
+   - **Fix:** add CSRF token generation in session + hidden form token + server-side validation.
+
+2. **State-changing actions via GET (High)**
+   - **Where:** delete actions are triggered by links with query params (`action=delete&id=...`).
+   - **Risk:** accidental deletion, CSRF amplification, unsafe semantics.
+   - **Fix:** switch delete routes to POST (or DELETE), require CSRF token, and confirm intent server-side.
+
+3. **Session fixation hardening missing (Medium)**
+   - **Where:** login flow does not call `session_regenerate_id(true)` after authentication.
+   - **Risk:** attacker can reuse pre-auth session ID.
+   - **Fix:** regenerate session ID on successful login and set stricter cookie flags.
+
+4. **Weak authorization granularity (Medium)**
+   - **Where:** only checks “session exists”; no role/permission model.
+   - **Risk:** no separation of privileges if multiple user types are introduced.
+   - **Fix:** add role column + authorization middleware/checks per action.
+
+5. **Upload hardening can be improved (Medium)**
+   - **Where:** `Uploader` accepts extension from original filename and stores under web-accessible path.
+   - **Risk:** extension spoofing edge cases; direct public serving of uploads.
+   - **Fix:** derive extension from trusted MIME mapping, optionally re-encode images, store outside web root and serve via controlled endpoint.
+
+6. **Validation is minimal (Low/Medium)**
+   - **Where:** controllers perform only basic non-empty/format checks.
+   - **Risk:** inconsistent data quality (invalid phones/emails/status/date logic edge cases).
+   - **Fix:** add centralized validation layer and stricter domain rules.
+
+7. **Business rule missing: reservation overlap check (Functional + Integrity)**
+   - **Where:** reservation create/update.
+   - **Risk:** same room can be double-booked for overlapping dates.
+   - **Fix:** enforce overlap query before insert/update and reject conflicting bookings.
+
+### Potential Security Improvements
+- Add security headers (CSP, X-Frame-Options, X-Content-Type-Options).
+- Add rate limiting / brute-force protection on login.
+- Log authentication and destructive actions.
+- Add account lockout policy.
+
+---
+
+## Code Quality Review
+
+### Strengths
+- Clean separation of MVC folders.
+- Controllers are relatively small and readable.
+- SQL is mostly parameterized.
+- View templates consistently reused via header/footer layout.
+
+### Inconsistencies / Maintainability Issues
+- Typo in repository name (`managment` instead of `management`).
+- No autoloader (many manual `require_once`).
+- Mixed approach: entities exist but managers often return associative arrays.
+- Repeated helper methods (`ensureAuthenticated`, `redirect`) across controllers.
+- No central error handler (raw 404 text in router).
+
+### Refactoring Ideas
+- Introduce base controller for shared auth/redirect behavior.
+- Add lightweight router abstraction and middleware pipeline.
+- Use Composer PSR-4 autoloading.
+- Normalize manager return types (entity objects or DTOs).
+- Introduce service layer for business rules (e.g., booking availability).
+
+---
+
+## Perspectives / Future Improvements
+
+- Role-based access control (admin/receptionist/manager).
+- Reservation availability conflict detection.
+- Pagination + sorting on large tables.
+- CSRF protection on all forms.
+- Strong validation/sanitization service.
+- Better file management (preview, replace, delete old images).
+- Reporting/statistics dashboard.
+- Calendar-based reservation visualization.
+- REST API layer for mobile/front-end integration.
+- Dockerized development environment.
+- Unit/integration tests (PHPUnit).
+- Centralized exception handling and user-friendly error pages.
+
+---
+
+## Possible Improvements for Academic Defense
+
+For oral presentation/demo, highlight:
+
+- How MVC is implemented from front controller to views.
+- OOP usage with entities/managers and responsibility separation.
+- Relational schema and foreign keys (`clients`, `rooms`, `reservations`).
+- Authentication flow with sessions and password hashing.
+- CRUD cycle for each core module.
+- Upload flow with `$_FILES` and validation in `Uploader`.
+- SQL security with prepared statements via PDO.
+- Honest discussion of current security gaps and planned mitigations.
+
+---
+
+## Authors / Contributors
+
+- **Author(s):** _To be completed by project team._
+- **Contributors:** _To be completed by project team._
+
+---
+
+## License
+No explicit license file is currently present in the repository. Add a `LICENSE` file if redistribution is intended.
