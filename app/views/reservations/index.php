@@ -38,7 +38,7 @@
         <?php foreach ($reservations as $reservation): ?>
             <tr>
                 <td><?= (int) $reservation['id'] ?></td>
-                <td><?= htmlspecialchars($reservation['first_name'] . ' ' . $reservation['last_name']) ?></td>
+                <td><?= htmlspecialchars($reservation['client_full_name']) ?></td>
                 <td><?= htmlspecialchars($reservation['room_number']) ?></td>
                 <td><?= htmlspecialchars($reservation['check_in']) ?></td>
                 <td><?= htmlspecialchars($reservation['check_out']) ?></td>

@@ -12,7 +12,9 @@
         <select name="client_id" required>
             <option value="">Select client</option>
             <?php foreach ($clients as $client): ?>
-                <option value="<?= (int) $client['id'] ?>"><?= htmlspecialchars($client['first_name'] . ' ' . $client['last_name']) ?></option>
+                <option value="<?= (int) $client['id'] ?>" <?= (int) $formData['client_id'] === (int) $client['id'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($client['first_name'] . ' ' . $client['last_name']) ?>
+                </option>
             <?php endforeach; ?>
         </select>
 
@@ -20,22 +22,23 @@
         <select name="room_id" required>
             <option value="">Select room</option>
             <?php foreach ($rooms as $room): ?>
-                <option value="<?= (int) $room['id'] ?>">Room <?= htmlspecialchars($room['room_number']) ?> - <?= htmlspecialchars($room['type']) ?></option>
+                <option value="<?= (int) $room['id'] ?>" <?= (int) $formData['room_id'] === (int) $room['id'] ? 'selected' : '' ?>>
+                    Room <?= htmlspecialchars($room['room_number']) ?> - <?= htmlspecialchars($room['type']) ?>
+                </option>
             <?php endforeach; ?>
         </select>
 
         <label>Check-in</label>
-        <input type="date" name="check_in" required>
+        <input type="date" name="check_in" value="<?= htmlspecialchars($formData['check_in']) ?>" required>
 
         <label>Check-out</label>
-        <input type="date" name="check_out" required>
+        <input type="date" name="check_out" value="<?= htmlspecialchars($formData['check_out']) ?>" required>
 
         <label>Status</label>
         <select name="status">
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="completed">Completed</option>
+            <?php foreach (['pending', 'confirmed', 'cancelled', 'completed'] as $status): ?>
+                <option value="<?= $status ?>" <?= $formData['status'] === $status ? 'selected' : '' ?>><?= ucfirst($status) ?></option>
+            <?php endforeach; ?>
         </select>
 
         <button type="submit">Save</button>

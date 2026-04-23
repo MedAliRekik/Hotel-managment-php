@@ -45,19 +45,34 @@ class ReservationController
         $rooms = $this->roomManager->getAll();
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $clientId = (int) ($_POST['client_id'] ?? 0);
-            $roomId = (int) ($_POST['room_id'] ?? 0);
-            $checkIn = trim($_POST['check_in'] ?? '');
-            $checkOut = trim($_POST['check_out'] ?? '');
-            $status = trim($_POST['status'] ?? 'pending');
+        $formData = [
+            'client_id' => 0,
+            'room_id' => 0,
+            'check_in' => '',
+            'check_out' => '',
+            'status' => 'pending',
+        ];
 
-            if ($clientId <= 0 || $roomId <= 0 || $checkIn === '' || $checkOut === '') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
+            $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
+            $formData['check_in'] = trim($_POST['check_in'] ?? '');
+            $formData['check_out'] = trim($_POST['check_out'] ?? '');
+            $formData['status'] = trim($_POST['status'] ?? 'pending');
+
+            if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
                 $error = 'All fields are required.';
-            } elseif ($checkOut < $checkIn) {
+            } elseif ($formData['check_out'] < $formData['check_in']) {
                 $error = 'Check-out date must be after check-in date.';
             } else {
-                $reservation = new Reservation(null, $clientId, $roomId, $checkIn, $checkOut, $status);
+                $reservation = new Reservation(
+                    null,
+                    $formData['client_id'],
+                    $formData['room_id'],
+                    $formData['check_in'],
+                    $formData['check_out'],
+                    $formData['status']
+                );
                 $this->reservationManager->create($reservation);
                 $this->redirect('reservation', 'index');
             }
@@ -79,19 +94,34 @@ class ReservationController
         $rooms = $this->roomManager->getAll();
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $clientId = (int) ($_POST['client_id'] ?? 0);
-            $roomId = (int) ($_POST['room_id'] ?? 0);
-            $checkIn = trim($_POST['check_in'] ?? '');
-            $checkOut = trim($_POST['check_out'] ?? '');
-            $status = trim($_POST['status'] ?? 'pending');
+        $formData = [
+            'client_id' => (int) $reservation['client_id'],
+            'room_id' => (int) $reservation['room_id'],
+            'check_in' => (string) $reservation['check_in'],
+            'check_out' => (string) $reservation['check_out'],
+            'status' => (string) $reservation['status'],
+        ];
 
-            if ($clientId <= 0 || $roomId <= 0 || $checkIn === '' || $checkOut === '') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
+            $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
+            $formData['check_in'] = trim($_POST['check_in'] ?? '');
+            $formData['check_out'] = trim($_POST['check_out'] ?? '');
+            $formData['status'] = trim($_POST['status'] ?? 'pending');
+
+            if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
                 $error = 'All fields are required.';
-            } elseif ($checkOut < $checkIn) {
+            } elseif ($formData['check_out'] < $formData['check_in']) {
                 $error = 'Check-out date must be after check-in date.';
             } else {
-                $updated = new Reservation($id, $clientId, $roomId, $checkIn, $checkOut, $status);
+                $updated = new Reservation(
+                    $id,
+                    $formData['client_id'],
+                    $formData['room_id'],
+                    $formData['check_in'],
+                    $formData['check_out'],
+                    $formData['status']
+                );
                 $this->reservationManager->update($updated);
                 $this->redirect('reservation', 'index');
             }

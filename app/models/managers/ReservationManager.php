@@ -16,11 +16,20 @@ class ReservationManager
 
     public function getAllWithRelations(): array
     {
-        $sql = 'SELECT r.*, c.first_name, c.last_name, rm.room_number
+        $sql = 'SELECT
+                    r.id,
+                    r.client_id,
+                    r.room_id,
+                    r.check_in,
+                    r.check_out,
+                    r.status,
+                    CONCAT(c.first_name, " ", c.last_name) AS client_full_name,
+                    rm.room_number
                 FROM reservations r
                 INNER JOIN clients c ON c.id = r.client_id
                 INNER JOIN rooms rm ON rm.id = r.room_id
                 ORDER BY r.id DESC';
+
         return $this->pdo->query($sql)->fetchAll();
     }
 
@@ -63,12 +72,21 @@ class ReservationManager
     public function delete(int $id): bool
     {
         $stmt = $this->pdo->prepare('DELETE FROM reservations WHERE id = :id');
+
         return $stmt->execute(['id' => $id]);
     }
 
     public function search(array $filters): array
     {
-        $sql = 'SELECT r.*, c.first_name, c.last_name, rm.room_number
+        $sql = 'SELECT
+                    r.id,
+                    r.client_id,
+                    r.room_id,
+                    r.check_in,
+                    r.check_out,
+                    r.status,
+                    CONCAT(c.first_name, " ", c.last_name) AS client_full_name,
+                    rm.room_number
                 FROM reservations r
                 INNER JOIN clients c ON c.id = r.client_id
                 INNER JOIN rooms rm ON rm.id = r.room_id
