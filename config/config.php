@@ -12,7 +12,7 @@ return [
         'charset' => 'utf8mb4',
     ],
     'app' => [
-        'base_url' => '/Hotel-managment-php/public/index.php',
+        'base_url' => '/index.php',
         'upload_dir' => __DIR__ . '/../uploads/rooms/',
         'max_upload_size' => 2 * 1024 * 1024,
     ],
