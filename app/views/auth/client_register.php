@@ -12,17 +12,18 @@
     <?php endif; ?>
 
     <form method="post" class="form-grid">
+        <?= Csrf::input(); ?>
         <label>First Name</label>
-        <input type="text" name="first_name" required>
+        <input type="text" name="first_name" value="<?= htmlspecialchars($formData['first_name'] ?? '') ?>" required>
 
         <label>Last Name</label>
-        <input type="text" name="last_name" required>
+        <input type="text" name="last_name" value="<?= htmlspecialchars($formData['last_name'] ?? '') ?>" required>
 
         <label>Phone</label>
-        <input type="text" name="phone">
+        <input type="text" name="phone" value="<?= htmlspecialchars($formData['phone'] ?? '') ?>">
 
         <label>Email</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" value="<?= htmlspecialchars($formData['email'] ?? '') ?>" required>
 
         <label>Password</label>
         <input type="password" name="password" minlength="6" required>

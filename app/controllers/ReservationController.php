@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../helpers/Csrf.php';
 require_once __DIR__ . '/../models/entities/Reservation.php';
 require_once __DIR__ . '/../models/managers/ReservationManager.php';
 require_once __DIR__ . '/../models/managers/ClientManager.php';
@@ -54,27 +55,35 @@ class ReservationController
         ];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
-            $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
-            $formData['check_in'] = trim($_POST['check_in'] ?? '');
-            $formData['check_out'] = trim($_POST['check_out'] ?? '');
-            $formData['status'] = trim($_POST['status'] ?? 'pending');
-
-            if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
-                $error = 'All fields are required.';
-            } elseif ($formData['check_out'] < $formData['check_in']) {
-                $error = 'Check-out date must be after check-in date.';
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
             } else {
-                $reservation = new Reservation(
-                    null,
-                    $formData['client_id'],
-                    $formData['room_id'],
-                    $formData['check_in'],
-                    $formData['check_out'],
-                    $formData['status']
-                );
-                $this->reservationManager->create($reservation);
-                $this->redirect('reservation', 'index');
+                $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
+                $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
+                $formData['check_in'] = trim($_POST['check_in'] ?? '');
+                $formData['check_out'] = trim($_POST['check_out'] ?? '');
+                $formData['status'] = trim($_POST['status'] ?? 'pending');
+
+                if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
+                    $error = 'All fields are required.';
+                } elseif (!$this->isValidDate($formData['check_in']) || !$this->isValidDate($formData['check_out'])) {
+                    $error = 'Invalid date format.';
+                } elseif ($formData['check_out'] <= $formData['check_in']) {
+                    $error = 'Check-out date must be after check-in date.';
+                } elseif ($this->reservationManager->hasRoomConflict($formData['room_id'], $formData['check_in'], $formData['check_out'])) {
+                    $error = 'The selected room is already booked for that period.';
+                } else {
+                    $reservation = new Reservation(
+                        null,
+                        $formData['client_id'],
+                        $formData['room_id'],
+                        $formData['check_in'],
+                        $formData['check_out'],
+                        $formData['status']
+                    );
+                    $this->reservationManager->create($reservation);
+                    $this->redirect('reservation', 'index');
+                }
             }
         }
 
@@ -103,27 +112,35 @@ class ReservationController
         ];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
-            $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
-            $formData['check_in'] = trim($_POST['check_in'] ?? '');
-            $formData['check_out'] = trim($_POST['check_out'] ?? '');
-            $formData['status'] = trim($_POST['status'] ?? 'pending');
-
-            if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
-                $error = 'All fields are required.';
-            } elseif ($formData['check_out'] < $formData['check_in']) {
-                $error = 'Check-out date must be after check-in date.';
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
             } else {
-                $updated = new Reservation(
-                    $id,
-                    $formData['client_id'],
-                    $formData['room_id'],
-                    $formData['check_in'],
-                    $formData['check_out'],
-                    $formData['status']
-                );
-                $this->reservationManager->update($updated);
-                $this->redirect('reservation', 'index');
+                $formData['client_id'] = (int) ($_POST['client_id'] ?? 0);
+                $formData['room_id'] = (int) ($_POST['room_id'] ?? 0);
+                $formData['check_in'] = trim($_POST['check_in'] ?? '');
+                $formData['check_out'] = trim($_POST['check_out'] ?? '');
+                $formData['status'] = trim($_POST['status'] ?? 'pending');
+
+                if ($formData['client_id'] <= 0 || $formData['room_id'] <= 0 || $formData['check_in'] === '' || $formData['check_out'] === '') {
+                    $error = 'All fields are required.';
+                } elseif (!$this->isValidDate($formData['check_in']) || !$this->isValidDate($formData['check_out'])) {
+                    $error = 'Invalid date format.';
+                } elseif ($formData['check_out'] <= $formData['check_in']) {
+                    $error = 'Check-out date must be after check-in date.';
+                } elseif ($this->reservationManager->hasRoomConflict($formData['room_id'], $formData['check_in'], $formData['check_out'], $id)) {
+                    $error = 'The selected room is already booked for that period.';
+                } else {
+                    $updated = new Reservation(
+                        $id,
+                        $formData['client_id'],
+                        $formData['room_id'],
+                        $formData['check_in'],
+                        $formData['check_out'],
+                        $formData['status']
+                    );
+                    $this->reservationManager->update($updated);
+                    $this->redirect('reservation', 'index');
+                }
             }
         }
 
@@ -132,13 +149,24 @@ class ReservationController
 
     public function delete(): void
     {
-        $id = (int) ($_GET['id'] ?? 0);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::isValid($_POST['csrf_token'] ?? null)) {
+            $this->redirect('reservation', 'index');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
 
         if ($id > 0) {
             $this->reservationManager->delete($id);
         }
 
         $this->redirect('reservation', 'index');
+    }
+
+    private function isValidDate(string $date): bool
+    {
+        $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+
+        return $dateTime !== false && $dateTime->format('Y-m-d') === $date;
     }
 
     private function ensureAuthenticated(): void

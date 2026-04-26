@@ -11,6 +11,7 @@
     <p><strong>Price:</strong> $<?= number_format((float) $room['price'], 2) ?></p>
 
     <form method="post" class="form-grid">
+        <?= Csrf::input(); ?>
         <input type="hidden" name="room_id" value="<?= (int) $room['id'] ?>">
 
         <label>Check-in</label>

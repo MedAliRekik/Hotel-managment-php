@@ -27,7 +27,11 @@
                 <td><?= htmlspecialchars((string) $client['email']) ?></td>
                 <td>
                     <a href="index.php?controller=client&action=edit&id=<?= (int) $client['id'] ?>">Edit</a>
-                    <a class="danger" onclick="return confirm('Delete this client?')" href="index.php?controller=client&action=delete&id=<?= (int) $client['id'] ?>">Delete</a>
+                    <form method="post" action="index.php?controller=client&action=delete" style="display:inline;" onsubmit="return confirm('Delete this client?')">
+                        <?= Csrf::input(); ?>
+                        <input type="hidden" name="id" value="<?= (int) $client['id'] ?>">
+                        <button type="submit" class="danger link-button">Delete</button>
+                    </form>
                 </td>
             </tr>
         <?php endforeach; ?>

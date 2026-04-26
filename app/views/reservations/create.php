@@ -8,6 +8,7 @@
     <?php endif; ?>
 
     <form method="post" class="form-grid">
+        <?= Csrf::input(); ?>
         <label>Client</label>
         <select name="client_id" required>
             <option value="">Select client</option>

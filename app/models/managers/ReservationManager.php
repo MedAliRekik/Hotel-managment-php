@@ -98,6 +98,31 @@ class ReservationManager
         return $stmt->execute(['id' => $id]);
     }
 
+
+    public function hasRoomConflict(int $roomId, string $checkIn, string $checkOut, ?int $excludeReservationId = null): bool
+    {
+        $sql = 'SELECT COUNT(*) FROM reservations
+                WHERE room_id = :room_id
+                  AND status IN ("pending", "confirmed")
+                  AND check_in < :check_out
+                  AND check_out > :check_in';
+
+        $params = [
+            'room_id' => $roomId,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+        ];
+
+        if ($excludeReservationId !== null) {
+            $sql .= ' AND id <> :exclude_id';
+            $params['exclude_id'] = $excludeReservationId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
     public function search(array $filters): array
     {
         $sql = 'SELECT
