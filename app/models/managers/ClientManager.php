@@ -29,15 +29,25 @@ class ClientManager
         return $client ?: null;
     }
 
+    public function findByEmail(string $email): ?array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM clients WHERE email = :email LIMIT 1');
+        $stmt->execute(['email' => $email]);
+        $client = $stmt->fetch();
+
+        return $client ?: null;
+    }
+
     public function create(Client $client): bool
     {
-        $stmt = $this->pdo->prepare('INSERT INTO clients (first_name, last_name, phone, email) VALUES (:first_name, :last_name, :phone, :email)');
+        $stmt = $this->pdo->prepare('INSERT INTO clients (first_name, last_name, phone, email, password) VALUES (:first_name, :last_name, :phone, :email, :password)');
 
         return $stmt->execute([
             'first_name' => $client->getFirstName(),
             'last_name' => $client->getLastName(),
             'phone' => $client->getPhone(),
             'email' => $client->getEmail(),
+            'password' => $client->getPassword(),
         ]);
     }
 

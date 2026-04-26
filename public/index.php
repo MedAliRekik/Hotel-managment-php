@@ -9,9 +9,11 @@ $action = $_GET['action'] ?? 'login';
 
 $routes = [
     'auth' => ['file' => __DIR__ . '/../app/controllers/AuthController.php', 'class' => 'AuthController'],
+    'clientauth' => ['file' => __DIR__ . '/../app/controllers/ClientAuthController.php', 'class' => 'ClientAuthController'],
     'client' => ['file' => __DIR__ . '/../app/controllers/ClientController.php', 'class' => 'ClientController'],
     'room' => ['file' => __DIR__ . '/../app/controllers/RoomController.php', 'class' => 'RoomController'],
     'reservation' => ['file' => __DIR__ . '/../app/controllers/ReservationController.php', 'class' => 'ReservationController'],
+    'clientportal' => ['file' => __DIR__ . '/../app/controllers/ClientPortalController.php', 'class' => 'ClientPortalController'],
 ];
 
 if ($controllerName === 'dashboard') {

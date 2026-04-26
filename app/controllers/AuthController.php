@@ -28,6 +28,7 @@ class AuthController
             $user = $this->userManager->findByEmail($email);
 
             if ($user && password_verify($password, $user->getPassword())) {
+                session_regenerate_id(true);
                 $_SESSION['user'] = [
                     'id' => $user->getId(),
                     'fullname' => $user->getFullname(),
@@ -44,8 +45,8 @@ class AuthController
 
     public function logout(): void
     {
-        session_unset();
-        session_destroy();
+        unset($_SESSION['user']);
+        session_regenerate_id(true);
 
         header('Location: index.php?controller=auth&action=login');
         exit;

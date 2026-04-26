@@ -9,15 +9,17 @@ class Client
     private string $lastName;
     private ?string $phone;
     private ?string $email;
+    private ?string $password;
     private ?string $createdAt;
 
-    public function __construct(?int $id, string $firstName, string $lastName, ?string $phone, ?string $email, ?string $createdAt = null)
+    public function __construct(?int $id, string $firstName, string $lastName, ?string $phone, ?string $email, ?string $password = null, ?string $createdAt = null)
     {
         $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->phone = $phone;
         $this->email = $email;
+        $this->password = $password;
         $this->createdAt = $createdAt;
     }
 
@@ -31,6 +33,8 @@ class Client
     public function setPhone(?string $phone): void { $this->phone = $phone; }
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(?string $email): void { $this->email = $email; }
+    public function getPassword(): ?string { return $this->password; }
+    public function setPassword(?string $password): void { $this->password = $password; }
     public function getCreatedAt(): ?string { return $this->createdAt; }
     public function setCreatedAt(?string $createdAt): void { $this->createdAt = $createdAt; }
 }

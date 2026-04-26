@@ -20,6 +20,15 @@ class RoomManager
         return $stmt->fetchAll();
     }
 
+
+    public function getAvailableRooms(): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM rooms WHERE status = :status ORDER BY id DESC");
+        $stmt->execute(['status' => 'available']);
+
+        return $stmt->fetchAll();
+    }
+
     public function getById(int $id): ?array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM rooms WHERE id = :id');

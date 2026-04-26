@@ -7,9 +7,9 @@ VALUES (
     '$2y$12$0P12.GJWQd8TSGgf32KTQ.THHqoLfbOVKRWgNdgh7KzIYOwWv1iwG'
 );
 
-INSERT INTO clients (first_name, last_name, phone, email) VALUES
-('John', 'Doe', '+1-555-1000', 'john.doe@mail.com'),
-('Jane', 'Smith', '+1-555-2000', 'jane.smith@mail.com');
+INSERT INTO clients (first_name, last_name, phone, email, password) VALUES
+('John', 'Doe', '+1-555-1000', 'john.doe@mail.com', NULL),
+('Jane', 'Smith', '+1-555-2000', 'jane.smith@mail.com', NULL);
 
 INSERT INTO rooms (room_number, type, price, status, image) VALUES
 ('101', 'Single', 80.00, 'available', NULL),

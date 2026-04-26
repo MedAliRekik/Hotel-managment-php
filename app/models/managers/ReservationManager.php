@@ -33,6 +33,28 @@ class ReservationManager
         return $this->pdo->query($sql)->fetchAll();
     }
 
+
+    public function getByClientId(int $clientId): array
+    {
+        $stmt = $this->pdo->prepare('SELECT
+                    r.id,
+                    r.client_id,
+                    r.room_id,
+                    r.check_in,
+                    r.check_out,
+                    r.status,
+                    rm.room_number,
+                    rm.type,
+                    rm.price
+                FROM reservations r
+                INNER JOIN rooms rm ON rm.id = r.room_id
+                WHERE r.client_id = :client_id
+                ORDER BY r.id DESC');
+        $stmt->execute(['client_id' => $clientId]);
+
+        return $stmt->fetchAll();
+    }
+
     public function getById(int $id): ?array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM reservations WHERE id = :id');
