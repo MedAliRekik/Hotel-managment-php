@@ -33,7 +33,11 @@
                 </td>
                 <td>
                     <a href="index.php?controller=room&action=edit&id=<?= (int) $room['id'] ?>">Edit</a>
-                    <a class="danger" onclick="return confirm('Delete this room?')" href="index.php?controller=room&action=delete&id=<?= (int) $room['id'] ?>">Delete</a>
+                    <form method="post" action="index.php?controller=room&action=delete" style="display:inline;" onsubmit="return confirm('Delete this room?')">
+                        <?= Csrf::input(); ?>
+                        <input type="hidden" name="id" value="<?= (int) $room['id'] ?>">
+                        <button type="submit" class="danger link-button">Delete</button>
+                    </form>
                 </td>
             </tr>
         <?php endforeach; ?>

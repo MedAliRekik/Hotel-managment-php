@@ -8,6 +8,7 @@
     <?php endif; ?>
 
     <form method="post" class="form-grid">
+        <?= Csrf::input(); ?>
         <label>First Name</label>
         <input type="text" name="first_name" value="<?= htmlspecialchars($client['first_name']) ?>" required>
 

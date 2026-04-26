@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../helpers/Csrf.php';
 require_once __DIR__ . '/../models/entities/Client.php';
 require_once __DIR__ . '/../models/managers/ClientManager.php';
 
@@ -26,12 +27,16 @@ class ClientController
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
+            }
+
             $firstName = trim($_POST['first_name'] ?? '');
             $lastName = trim($_POST['last_name'] ?? '');
             $phone = trim($_POST['phone'] ?? '');
             $email = trim($_POST['email'] ?? '');
 
-            if ($firstName === '' || $lastName === '') {
+            if (!$error && ($firstName === '' || $lastName === '')) {
                 $error = 'First name and last name are required.';
             } else {
                 $client = new Client(null, $firstName, $lastName, $phone ?: null, $email ?: null);
@@ -55,12 +60,16 @@ class ClientController
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
+            }
+
             $firstName = trim($_POST['first_name'] ?? '');
             $lastName = trim($_POST['last_name'] ?? '');
             $phone = trim($_POST['phone'] ?? '');
             $email = trim($_POST['email'] ?? '');
 
-            if ($firstName === '' || $lastName === '') {
+            if (!$error && ($firstName === '' || $lastName === '')) {
                 $error = 'First name and last name are required.';
             } else {
                 $updated = new Client($id, $firstName, $lastName, $phone ?: null, $email ?: null);
@@ -74,7 +83,11 @@ class ClientController
 
     public function delete(): void
     {
-        $id = (int) ($_GET['id'] ?? 0);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::isValid($_POST['csrf_token'] ?? null)) {
+            $this->redirect('client', 'index');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
 
         if ($id > 0) {
             $this->clientManager->delete($id);

@@ -8,6 +8,7 @@
     <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data" class="form-grid">
+        <?= Csrf::input(); ?>
         <label>Room Number</label>
         <input type="text" name="room_number" value="<?= htmlspecialchars($room['room_number']) ?>" required>
 

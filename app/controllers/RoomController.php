@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../helpers/Csrf.php';
 require_once __DIR__ . '/../models/entities/Room.php';
 require_once __DIR__ . '/../models/managers/RoomManager.php';
 require_once __DIR__ . '/../models/Uploader.php';
@@ -31,6 +32,10 @@ class RoomController
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
+            }
+
             $roomNumber = trim($_POST['room_number'] ?? '');
             $type = trim($_POST['type'] ?? '');
             $price = (float) ($_POST['price'] ?? 0);
@@ -73,6 +78,10 @@ class RoomController
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::isValid($_POST['csrf_token'] ?? null)) {
+                $error = 'Invalid request token. Please try again.';
+            }
+
             $roomNumber = trim($_POST['room_number'] ?? '');
             $type = trim($_POST['type'] ?? '');
             $price = (float) ($_POST['price'] ?? 0);
@@ -105,7 +114,11 @@ class RoomController
 
     public function delete(): void
     {
-        $id = (int) ($_GET['id'] ?? 0);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::isValid($_POST['csrf_token'] ?? null)) {
+            $this->redirect('room', 'index');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
 
         if ($id > 0) {
             $this->roomManager->delete($id);

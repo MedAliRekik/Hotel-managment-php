@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../helpers/Csrf.php';
+
 $controller = strtolower($_GET['controller'] ?? 'dashboard');
 $action = $_GET['action'] ?? 'index';
 ?>
@@ -16,12 +18,18 @@ $action = $_GET['action'] ?? 'index';
     <?php if (!empty($_SESSION['user'])): ?>
         <div class="user-box">
             <span>Hello, <?= htmlspecialchars($_SESSION['user']['fullname']) ?></span>
-            <a href="index.php?controller=auth&action=logout">Logout</a>
+            <form method="post" action="index.php?controller=auth&action=logout" style="display:inline;">
+                <?= Csrf::input(); ?>
+                <button type="submit" class="link-button">Logout</button>
+            </form>
         </div>
     <?php elseif (!empty($_SESSION['client'])): ?>
         <div class="user-box">
             <span>Hello, <?= htmlspecialchars($_SESSION['client']['full_name']) ?></span>
-            <a href="index.php?controller=clientauth&action=logout">Logout</a>
+            <form method="post" action="index.php?controller=clientauth&action=logout" style="display:inline;">
+                <?= Csrf::input(); ?>
+                <button type="submit" class="link-button">Logout</button>
+            </form>
         </div>
     <?php endif; ?>
 </header>
@@ -35,6 +43,7 @@ $action = $_GET['action'] ?? 'index';
 </nav>
 <?php elseif (!empty($_SESSION['client'])): ?>
 <nav class="navbar">
+    <a class="<?= $controller === 'clientportal' && $action === 'dashboard' ? 'active' : '' ?>" href="index.php?controller=clientportal&action=dashboard">Client Dashboard</a>
     <a class="<?= $controller === 'clientportal' && $action === 'rooms' ? 'active' : '' ?>" href="index.php?controller=clientportal&action=rooms">Available Rooms</a>
     <a class="<?= $controller === 'clientportal' && $action === 'myReservations' ? 'active' : '' ?>" href="index.php?controller=clientportal&action=myReservations">My Reservations</a>
 </nav>

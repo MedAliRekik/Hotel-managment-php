@@ -8,6 +8,7 @@
     <?php endif; ?>
 
     <form method="post" class="form-grid">
+        <?= Csrf::input(); ?>
         <label>Email</label>
         <input type="email" name="email" required>
 

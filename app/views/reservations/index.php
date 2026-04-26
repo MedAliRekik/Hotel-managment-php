@@ -45,7 +45,11 @@
                 <td><?= htmlspecialchars($reservation['status']) ?></td>
                 <td>
                     <a href="index.php?controller=reservation&action=edit&id=<?= (int) $reservation['id'] ?>">Edit</a>
-                    <a class="danger" onclick="return confirm('Delete this reservation?')" href="index.php?controller=reservation&action=delete&id=<?= (int) $reservation['id'] ?>">Delete</a>
+                    <form method="post" action="index.php?controller=reservation&action=delete" style="display:inline;" onsubmit="return confirm('Delete this reservation?')">
+                        <?= Csrf::input(); ?>
+                        <input type="hidden" name="id" value="<?= (int) $reservation['id'] ?>">
+                        <button type="submit" class="danger link-button">Delete</button>
+                    </form>
                 </td>
             </tr>
         <?php endforeach; ?>
