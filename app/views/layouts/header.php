@@ -1,5 +1,5 @@
 <?php
-$controller = $_GET['controller'] ?? 'dashboard';
+$controller = strtolower($_GET['controller'] ?? 'dashboard');
 $action = $_GET['action'] ?? 'index';
 ?>
 <!DOCTYPE html>
@@ -18,6 +18,11 @@ $action = $_GET['action'] ?? 'index';
             <span>Hello, <?= htmlspecialchars($_SESSION['user']['fullname']) ?></span>
             <a href="index.php?controller=auth&action=logout">Logout</a>
         </div>
+    <?php elseif (!empty($_SESSION['client'])): ?>
+        <div class="user-box">
+            <span>Hello, <?= htmlspecialchars($_SESSION['client']['full_name']) ?></span>
+            <a href="index.php?controller=clientauth&action=logout">Logout</a>
+        </div>
     <?php endif; ?>
 </header>
 
@@ -27,6 +32,11 @@ $action = $_GET['action'] ?? 'index';
     <a class="<?= $controller === 'client' ? 'active' : '' ?>" href="index.php?controller=client&action=index">Clients</a>
     <a class="<?= $controller === 'room' ? 'active' : '' ?>" href="index.php?controller=room&action=index">Rooms</a>
     <a class="<?= $controller === 'reservation' ? 'active' : '' ?>" href="index.php?controller=reservation&action=index">Reservations</a>
+</nav>
+<?php elseif (!empty($_SESSION['client'])): ?>
+<nav class="navbar">
+    <a class="<?= $controller === 'clientportal' && $action === 'rooms' ? 'active' : '' ?>" href="index.php?controller=clientportal&action=rooms">Available Rooms</a>
+    <a class="<?= $controller === 'clientportal' && $action === 'myReservations' ? 'active' : '' ?>" href="index.php?controller=clientportal&action=myReservations">My Reservations</a>
 </nav>
 <?php endif; ?>
 

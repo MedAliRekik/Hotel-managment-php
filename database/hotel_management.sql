@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS clients (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(50) NULL,
-    email VARCHAR(150) NULL,
+    email VARCHAR(150) NULL UNIQUE,
+    password VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

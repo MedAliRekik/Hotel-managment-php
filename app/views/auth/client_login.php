@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="card auth-card">
-    <h2>Admin Login</h2>
+    <h2>Client Login</h2>
 
     <?php if (!empty($error)): ?>
         <div class="alert error"><?= htmlspecialchars($error) ?></div>
@@ -17,8 +17,8 @@
         <button type="submit">Login</button>
     </form>
 
-    <p class="hint">Demo account: admin@hotel.com / admin123</p>
-    <p class="hint">Hotel client? <a href="index.php?controller=clientauth&action=login">Go to client login</a></p>
+    <p class="hint">No account yet? <a href="index.php?controller=clientauth&action=register">Register here</a></p>
+    <p class="hint">Admin? <a href="index.php?controller=auth&action=login">Go to admin login</a></p>
 </div>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
